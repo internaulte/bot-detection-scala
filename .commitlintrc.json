@@ -1,0 +1,15 @@
+{
+  "extends": ["@commitlint/config-conventional"],
+  "header-max-lenght": [
+    2,
+    "always",
+    80
+  ],
+  "scope-enum": [
+    2,
+    "always",
+    [
+      "bot-detection"
+    ]
+  ]
+}

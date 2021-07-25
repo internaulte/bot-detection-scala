@@ -1,0 +1,78 @@
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>${STDOUT_LOG_LEVEL:-WARN}</level>
+        </filter>
+        <encoder>
+            <pattern>%d{"yyyy-MM-dd'T'HH:mm:ss.SSSXXX", UTC} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/%d{yyyy-MM-dd}/error.log</fileNamePattern>
+            <maxHistory>${MAX_ERROR_LOG_HISTORY:-14}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{"yyyy-MM-dd'T'HH:mm:ss.SSSXXX", UTC};%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ASYNC_ERROR" class="ch.qos.logback.classic.AsyncAppender">
+        <neverBlock>true</neverBlock>
+        <appender-ref ref="ERROR" />
+        <appender-ref ref="STDOUT" />
+    </appender>
+
+    <logger name="errorLogger" level="ERROR" additivity="false">
+        <appender-ref ref="ASYNC_ERROR" />
+    </logger>
+
+    <appender name="NOBOTS" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/nobots.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/%d{yyyy-MM-dd}/nobots.log</fileNamePattern>
+            <maxHistory>${MAX_ERROR_LOG_HISTORY:-14}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{"yyyy-MM-dd'T'HH:mm:ss.SSSXXX", UTC};%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ASYNC_NOBOTS" class="ch.qos.logback.classic.AsyncAppender">
+        <neverBlock>true</neverBlock>
+        <appender-ref ref="NOBOTS" />
+    </appender>
+
+    <logger name="nobotsLogger" level="INFO" additivity="false">
+        <appender-ref ref="ASYNC_INGESTION" />
+    </logger>
+
+    <appender name="BOTS" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/bots.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/%d{yyyy-MM-dd}/bots.log</fileNamePattern>
+            <maxHistory>${MAX_DB_LOG_HISTORY:-14}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{"yyyy-MM-dd'T'HH:mm:ss.SSSXXX", UTC};%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ASYNC_BOTS" class="ch.qos.logback.classic.AsyncAppender">
+        <neverBlock>true</neverBlock>
+        <appender-ref ref="BOTS" />
+    </appender>
+
+    <logger name="botsLogger" level="INFO" additivity="false">
+        <appender-ref ref="ASYNC_BOTS" />
+    </logger>
+
+    <logger name="org.apache.spark" level="WARN"/>
+    <logger name="Remoting" level="WARN"/>
+
+    <root level="${ROOT_LOG_LEVEL:-WARN}">
+        <appender-ref ref="ASYNC" />
+    </root>
+</configuration>
