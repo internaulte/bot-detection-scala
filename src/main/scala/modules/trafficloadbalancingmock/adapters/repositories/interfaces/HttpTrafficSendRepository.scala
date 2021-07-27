@@ -1,8 +1,8 @@
-package modules.trafficloadbalancingmock.adapters.kafka.interfaces
+package modules.trafficloadbalancingmock.adapters.repositories.interfaces
 
 import scala.concurrent.Future
 
-trait KafkaClient {
+trait HttpTrafficSendRepository {
   def createTopic(topicName: String, numPartitions: Int, replicationFactor: Short): Future[Unit]
 
   def closeTopic(topicName: String): Future[Unit]

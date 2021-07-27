@@ -1,36 +1,31 @@
 package modules.trafficloadbalancingmock.adapters.kafka
 
-import modules.common.utils.RandomUtils
+import modules.trafficloadbalancingmock.config.TargetServersConfig
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.producer.KafkaProducer
 
 import java.util.Properties
 
-protected object KafkaUtils {
-  def getRandomKafkaProducer: KafkaProducer[String, String] = {
-    val indexOfKafkaServer = RandomUtils.getRandomInt(maxExcludedValue = kafkaProducers.size)
-    kafkaProducers(indexOfKafkaServer)
-  }
-
-  val kafkaProducers: Vector[KafkaProducer[String, String]] = {
+protected[kafka] object KafkaUtils {
+  val kafkaProducers: Map[String, KafkaProducer[String, String]] = {
     val kafkaServerOneProducerProperties: Properties = {
       val props = new Properties()
-      props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, KafkaConfig.kafkaServerOne)
+      props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, TargetServersConfig.targetServerOne)
 
       setAdditionalKafkaProperties(props)
     }
 
     val kafkaServerTwoProducerProperties: Properties = {
       val props = new Properties()
-      props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, KafkaConfig.kafkaServerTwo)
+      props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, TargetServersConfig.targetServerTwo)
 
       setAdditionalKafkaProperties(props)
     }
 
-    Vector(
+    Map(
       // those kafka producers are assumed to stay permanently opened
-      new KafkaProducer[String, String](kafkaServerOneProducerProperties),
-      new KafkaProducer[String, String](kafkaServerTwoProducerProperties)
+      TargetServersConfig.targetServerOne -> new KafkaProducer[String, String](kafkaServerOneProducerProperties),
+      TargetServersConfig.targetServerTwo -> new KafkaProducer[String, String](kafkaServerTwoProducerProperties)
     )
   }
 
