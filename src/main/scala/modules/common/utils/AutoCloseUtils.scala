@@ -1,4 +1,4 @@
-package utils
+package modules.common.utils
 
 import java.io.Closeable
 import scala.util.{Failure, Success, Try}

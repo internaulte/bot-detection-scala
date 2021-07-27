@@ -13,8 +13,9 @@ ThisBuild / scalaVersion := "2.12.14"
 
 val flinkVersion = "1.13.1"
 val kafkaVersion = "2.8.0"
-val logbackVersion = "1.2.3"
+val logbackVersion = "1.2.4"
 val scalaTestMockitoVersion = "1.16.37"
+val scalaTestVersion = "3.2.9"
 
 lazy val dependencies = Seq(
   "org.apache.flink" %% "flink-clients"           % flinkVersion            % "provided",
@@ -24,7 +25,8 @@ lazy val dependencies = Seq(
   "org.apache.flink"  % "flink-connector-base"    % flinkVersion            % "provided",
   "org.apache.kafka"  % "kafka-clients"           % kafkaVersion,
   "ch.qos.logback"    % "logback-classic"         % logbackVersion          % "runtime",
-  "org.mockito"      %% "mockito-scala-scalatest" % scalaTestMockitoVersion % Test
+  "org.mockito"      %% "mockito-scala-scalatest" % scalaTestMockitoVersion % Test,
+  "org.scalatest"    %% "scalatest"               % scalaTestVersion        % Test
 )
 
 lazy val root = (project in file(".")).settings(

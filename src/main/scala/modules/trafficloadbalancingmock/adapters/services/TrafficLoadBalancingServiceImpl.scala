@@ -1,0 +1,5 @@
+package modules.trafficloadbalancingmock.adapters.services
+
+import modules.trafficloadbalancingmock.adapters.services.interfaces.TrafficLoadBalancingService
+
+class TrafficLoadBalancingServiceImpl extends TrafficLoadBalancingService {}

@@ -1,4 +1,4 @@
-package core.adapters.log
+package modules.common.log
 
 import org.slf4j.{Logger, LoggerFactory}
 

@@ -1,14 +1,15 @@
-package core.adapters.kafka
+package modules.trafficloadbalancingmock.adapters.repositories
 
+import modules.trafficloadbalancingmock.adapters.kafka.interfaces.KafkaClient
+import modules.trafficloadbalancingmock.adapters.repositories.interfaces.HttpTrafficSend
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.admin.{AdminClient, NewTopic}
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 
 import java.util.{Collections, Properties}
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class KafkaClientImpl extends KafkaClient {
+class HttpTrafficSendImpl(private val kafkaClient: KafkaClient) extends HttpTrafficSend {
   override def createTopic(
       topicName: String,
       serverName: String,
@@ -38,7 +39,7 @@ class KafkaClientImpl extends KafkaClient {
     }
   }
 
-  override def pushToKafkaTopic(
+  override def pushToTopic(
       message: String,
       topicName: String,
       kafkaProducer: KafkaProducer[String, String]
