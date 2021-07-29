@@ -33,9 +33,6 @@ class TrafficAnalysisJobsImpl(
       trafficAnalysisWriting.sendAnalysisResultToStore(transformationHttpTrafficStream)
 
       flinkEnv.execute()
-    }.recover {
-      case exception: Throwable =>
-        errorLogger.error("error in traffic analysis", exception)
     }
   }
 }

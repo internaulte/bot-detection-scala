@@ -13,7 +13,7 @@ protected[jobs] class TrafficAnalysisTransformationImpl extends TrafficAnalysisT
     httpTrafficStream.map(log => (isSimpleBotLog(log), log))
   }
 
-  private def isSimpleBotLog(log: ApacheCombinedLogFormat): Boolean = {
+  private[transformations] def isSimpleBotLog(log: ApacheCombinedLogFormat): Boolean = {
     if (
       isStringOptionEmpty(log.clientIP) || isStringOptionEmpty(log.request) ||
       log.httpRequestDate.isEmpty || isStringOptionEmpty(log.userAgent)
@@ -27,14 +27,14 @@ protected[jobs] class TrafficAnalysisTransformationImpl extends TrafficAnalysisT
     }
   }
 
-  private def isStringOptionEmpty(stringOpt: Option[String]): Boolean = {
+  private[transformations] def isStringOptionEmpty(stringOpt: Option[String]): Boolean = {
     stringOpt match {
-      case Some(string) => string.isEmpty
+      case Some(string) => string.trim.isEmpty
       case None => true
     }
   }
 
-  private def isStringValidUrl(string: String): Boolean = {
+  private[transformations] def isStringValidUrl(string: String): Boolean = {
     val owaspUrlRegExp =
       "^((((https?|ftps?|gopher|telnet|nntp)://)|(mailto:|news:))(%[0-9A-Fa-f]{2}|[-()_.!~*';/?:@&=+$,A-Za-z0-9])+)([).!';/?:,][[:blank:]])?$"
     val pattern = Pattern.compile(owaspUrlRegExp)

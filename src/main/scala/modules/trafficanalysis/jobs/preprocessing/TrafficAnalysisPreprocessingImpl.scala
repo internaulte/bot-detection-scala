@@ -7,6 +7,8 @@ import modules.trafficanalysis.jobs.schemas.ApacheCombinedLogFormat
 import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment, createTypeInformation}
 
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatterBuilder
+import java.util.Locale
 import scala.util.{Failure, Success, Try}
 
 protected[jobs] class TrafficAnalysisPreprocessingImpl extends TrafficAnalysisPreprocessing {
@@ -16,14 +18,18 @@ protected[jobs] class TrafficAnalysisPreprocessingImpl extends TrafficAnalysisPr
     httpTrafficStream.map(line => parseLineToObject(line))
   }
 
-  private def parseLineToObject(line: String): ApacheCombinedLogFormat = {
+  private[preprocessing] def parseLineToObject(line: String): ApacheCombinedLogFormat = {
     val lineAsStrings = parseLineToLog(line)
+    val dateTimeFormater = new DateTimeFormatterBuilder()
+      .appendPattern("dd/MMM/yyyy:HH:mm:ss Z")
+      .toFormatter(Locale.ENGLISH)
+
     Try(
       ApacheCombinedLogFormat(
         clientIP = convertStringValueToOption(lineAsStrings.head),
         clientIdentId = convertStringValueToOption(lineAsStrings(1)),
         userName = convertStringValueToOption(lineAsStrings(2)),
-        httpRequestDate = convertStringValueToOption(lineAsStrings(3)).map(ZonedDateTime.parse),
+        httpRequestDate = convertStringValueToOption(lineAsStrings(3)).map(ZonedDateTime.parse(_, dateTimeFormater)),
         request = convertStringValueToOption(lineAsStrings(4)),
         statusCode = convertStringValueToOption(lineAsStrings(5)),
         responseSize = convertStringValueToOption(lineAsStrings(6)).map(_.toLong),
@@ -38,7 +44,7 @@ protected[jobs] class TrafficAnalysisPreprocessingImpl extends TrafficAnalysisPr
     }
   }
 
-  private def convertStringValueToOption(stringValue: String): Option[String] = {
+  private[preprocessing] def convertStringValueToOption(stringValue: String): Option[String] = {
     if (stringValue.isEmpty || stringValue == "-") {
       None
     } else {
@@ -46,11 +52,11 @@ protected[jobs] class TrafficAnalysisPreprocessingImpl extends TrafficAnalysisPr
     }
   }
 
-  private def parseLineToLog(line: String): Seq[String] = {
-    val (log, _, _) = line.foldLeft((Seq.empty[String], "", false)) {
+  private[preprocessing] def parseLineToLog(line: String): Seq[String] = {
+    val (log, lastParsingString, _) = line.foldLeft((Seq.empty[String], "", false)) {
       case ((logs, parsingString, isEscaped), char) =>
-        val isStartEscape = isStartEscapeChar(char, isEscaped)
-        val isEndEscape = isEndEscapeChar(char, isEscaped)
+        val isStartEscape = isStartEscapeChar(char)
+        val isEndEscape = isEndEscapeChar(char)
         val isCutting = isCuttingChar(char, isEscaped)
 
         val newIsEscapedValue = getNewIsEscapedValue(isEscaped, isStartEscape, isEndEscape)
@@ -58,26 +64,18 @@ protected[jobs] class TrafficAnalysisPreprocessingImpl extends TrafficAnalysisPr
         val newParsingString = getNewParsingString(isCutting, isStartEscape, isEndEscape, char, parsingString)
         (newLog, newParsingString, newIsEscapedValue)
     }
-    log.reverse
+    (lastParsingString +: log).reverse
   }
 
-  private def isStartEscapeChar(char: Char, isEscaped: Boolean): Boolean = {
-    if (isEscaped) {
-      false
-    } else {
-      TrafficAnalysisUtils.startEscapeChars.contains(char)
-    }
+  private[preprocessing] def isStartEscapeChar(char: Char): Boolean = {
+    TrafficAnalysisUtils.startEscapeChars.contains(char)
   }
 
-  private def isEndEscapeChar(char: Char, isEscaped: Boolean): Boolean = {
-    if (isEscaped) {
-      TrafficAnalysisUtils.endEscapeChars.contains(char)
-    } else {
-      false
-    }
+  private[preprocessing] def isEndEscapeChar(char: Char): Boolean = {
+    TrafficAnalysisUtils.endEscapeChars.contains(char)
   }
 
-  private def isCuttingChar(char: Char, isEscaped: Boolean): Boolean = {
+  private[preprocessing] def isCuttingChar(char: Char, isEscaped: Boolean): Boolean = {
     if (isEscaped) {
       false
     } else {
@@ -85,7 +83,7 @@ protected[jobs] class TrafficAnalysisPreprocessingImpl extends TrafficAnalysisPr
     }
   }
 
-  private def getNewIsEscapedValue(
+  private[preprocessing] def getNewIsEscapedValue(
       isEscaped: Boolean,
       isStartEscapeChar: Boolean,
       isEndEscapeChar: Boolean
@@ -93,16 +91,16 @@ protected[jobs] class TrafficAnalysisPreprocessingImpl extends TrafficAnalysisPr
     if (isEscaped && isEndEscapeChar) {
       false
     } else {
-      isStartEscapeChar
+      isEscaped || isStartEscapeChar
     }
   }
 
-  private def getNewLog(isCutting: Boolean, parsingString: String, logs: Seq[String]): Seq[String] = {
+  private[preprocessing] def getNewLog(isCutting: Boolean, parsingString: String, logs: Seq[String]): Seq[String] = {
     if (isCutting) { parsingString.reverse +: logs }
     else logs
   }
 
-  private def getNewParsingString(
+  private[preprocessing] def getNewParsingString(
       isCutting: Boolean,
       isStartEscape: Boolean,
       isEndEscape: Boolean,
