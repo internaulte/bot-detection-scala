@@ -1,14 +1,15 @@
 package modules.bootstrap
 
-import modules.trafficloadbalancingmock.adapters.kafka.KafkaClientImpl
-import modules.trafficloadbalancingmock.adapters.kafka.config.KafkaConfig
-import modules.trafficloadbalancingmock.adapters.kafka.interfaces.KafkaClient
-import modules.trafficloadbalancingmock.adapters.repositories.HttpTrafficSendRepositoryImpl
-import modules.trafficloadbalancingmock.adapters.services.TrafficLoadBalancingServiceImpl
-import modules.trafficloadbalancingmock.domain.usecases.HttpTrafficGenerationUseCases
-import modules.webserversmock.adapters.repositories.WebServerMockRepositoryImpl
-import modules.webserversmock.config.WebServersDataConfig
-import modules.webserversmock.domain.usecases.WebServerMockUseCases
+import modules.common.config.MessagingServersConfig
+import modules.trafficgeneration.trafficloadbalancingmock.adapters.kafka.{KafkaClientImpl, KafkaUtils}
+import modules.trafficgeneration.trafficloadbalancingmock.adapters.kafka.config.KafkaConfig
+import modules.trafficgeneration.trafficloadbalancingmock.adapters.kafka.interfaces.KafkaClient
+import modules.trafficgeneration.trafficloadbalancingmock.adapters.repositories.HttpTrafficSendRepositoryImpl
+import modules.trafficgeneration.trafficloadbalancingmock.adapters.services.TrafficLoadBalancingServiceImpl
+import modules.trafficgeneration.trafficloadbalancingmock.domain.usecases.HttpTrafficGenerationUseCases
+import modules.trafficgeneration.webserversmock.adapters.repositories.WebServerMockRepositoryImpl
+import modules.trafficgeneration.webserversmock.config.WebServersDataConfig
+import modules.trafficgeneration.webserversmock.domain.usecases.WebServerMockUseCases
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -27,7 +28,7 @@ object Bootstrap {
     for {
       //kafka topics creation
       _ <- httpTrafficGenerationUseCases.createTopic(
-        topicName = WebServersDataConfig.botDetectionTopic,
+        topicName = MessagingServersConfig.botDetectionTopic,
         numPartitions = KafkaConfig.topicNumberOfPartitions,
         replicationFactor = KafkaConfig.topicReplicationFactor
       )
@@ -37,10 +38,14 @@ object Bootstrap {
       _ <- Future.sequence(
         WebServersDataConfig.webServersLogs.map(webServerMockUseCases.sendAllWebServerLogsToBotDetection)
       )
+      _ = KafkaUtils.kafkaProducers.values.foreach { kafkaProducer =>
+        kafkaProducer.flush()
+        kafkaProducer.close()
+      }
       treatmentDuration = System.currentTimeMillis() - startTreatment
 
       //kafka topics close
-      _ <- httpTrafficGenerationUseCases.closeTopic(topicName = WebServersDataConfig.botDetectionTopic)
+      _ <- httpTrafficGenerationUseCases.closeTopic(topicName = MessagingServersConfig.botDetectionTopic)
     } yield {
       println(treatmentDuration)
       System.exit(0)

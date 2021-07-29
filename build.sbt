@@ -13,7 +13,7 @@ ThisBuild / scalaVersion := "2.12.14"
 
 val flinkVersion = "1.13.1"
 val kafkaVersion = "2.8.0"
-val logbackVersion = "1.2.4"
+val logbackVersion = "1.2.5"
 val scalaTestMockitoVersion = "1.16.37"
 val scalaTestVersion = "3.2.9"
 
