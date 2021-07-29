@@ -10,4 +10,6 @@ protected[webServersMock] object WebServersDataConfig {
   private val thirdWebServerLogs: WebServerLogs = WebServerLogs(List())
 
   val webServersLogs: Seq[WebServerLogs] = Seq(firstWebServerLogs, secondWebServerLogs, thirdWebServerLogs)
+
+  val data = List()
 }

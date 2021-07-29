@@ -1,17 +1,17 @@
 package modules.trafficgeneration.webserversmock.adapters.repositories
 
+import modules.common.config.MessagingServersConfig
 import modules.trafficgeneration.trafficloadbalancingmock.adapters.services.interfaces.TrafficLoadBalancingService
 import modules.trafficgeneration.webserversmock.adapters.repositories.interfaces.WebServerMockRepository
-import modules.trafficgeneration.webserversmock.config.WebServersDataConfig
 
 import scala.concurrent.Future
 
-class WebServerMockRepositoryImpl(trafficLoadBalancingService: TrafficLoadBalancingService)
+class WebServerMockRepositoryImpl(private val trafficLoadBalancingService: TrafficLoadBalancingService)
     extends WebServerMockRepository {
   override def sendLogToBotDetection(log: String): Future[Unit] = {
     trafficLoadBalancingService.sendWebServerLog(
       log = log,
-      destination = WebServersDataConfig.botDetectionTopic
+      destination = MessagingServersConfig.botDetectionTopic
     )
   }
 }

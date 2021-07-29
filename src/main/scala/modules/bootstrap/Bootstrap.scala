@@ -1,6 +1,7 @@
 package modules.bootstrap
 
 import modules.common.config.MessagingServersConfig
+import modules.trafficanalysis.jobs.TrafficAnalysisJobsImpl
 import modules.trafficgeneration.trafficloadbalancingmock.adapters.kafka.{KafkaClientImpl, KafkaUtils}
 import modules.trafficgeneration.trafficloadbalancingmock.adapters.kafka.config.KafkaConfig
 import modules.trafficgeneration.trafficloadbalancingmock.adapters.kafka.interfaces.KafkaClient
@@ -25,6 +26,8 @@ object Bootstrap {
     lazy val webServerMockRepository = new WebServerMockRepositoryImpl(trafficLoadBalancingService)
     lazy val webServerMockUseCases = new WebServerMockUseCases(webServerMockRepository)
 
+    lazy val trafficAnalysisJobs = new TrafficAnalysisJobsImpl
+
     for {
       //kafka topics creation
       _ <- httpTrafficGenerationUseCases.createTopic(
@@ -32,6 +35,10 @@ object Bootstrap {
         numPartitions = KafkaConfig.topicNumberOfPartitions,
         replicationFactor = KafkaConfig.topicReplicationFactor
       )
+
+      // start flink pipelines
+      _ = trafficAnalysisJobs.startTrafficAnalysis
+
       startTreatment = System.currentTimeMillis()
 
       // Start sending Data in parallel for each list of logs:
