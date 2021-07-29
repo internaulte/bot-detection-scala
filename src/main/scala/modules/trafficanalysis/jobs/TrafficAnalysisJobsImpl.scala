@@ -5,6 +5,8 @@ import modules.trafficanalysis.jobs.preprocessing.TrafficAnalysisPreprocessingIm
 import modules.trafficanalysis.jobs.preprocessing.interfaces.TrafficAnalysisPreprocessing
 import modules.trafficanalysis.jobs.reading.TrafficAnalysisReadingImpl
 import modules.trafficanalysis.jobs.reading.interfaces.TrafficAnalysisReading
+import modules.trafficanalysis.jobs.transformations.TrafficAnalysisTransformationImpl
+import modules.trafficanalysis.jobs.transformations.interfaces.TrafficAnalysisTransformation
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -12,7 +14,8 @@ import scala.concurrent.Future
 
 class TrafficAnalysisJobsImpl(
     private val trafficAnalysisReading: TrafficAnalysisReading = new TrafficAnalysisReadingImpl,
-    private val trafficAnalysisPreprocessing: TrafficAnalysisPreprocessing = new TrafficAnalysisPreprocessingImpl
+    private val trafficAnalysisPreprocessing: TrafficAnalysisPreprocessing = new TrafficAnalysisPreprocessingImpl,
+    private val trafficAnalysisTransformation: TrafficAnalysisTransformation = new TrafficAnalysisTransformationImpl
 ) extends TrafficAnalysisJobs {
   private implicit val flinkEnv: StreamExecutionEnvironment = TrafficAnalysisUtils.flinkEnv
 
@@ -20,6 +23,8 @@ class TrafficAnalysisJobsImpl(
     Future {
       val httpTrafficStream = trafficAnalysisReading.readHttpTrafficStream
       val preprocessedHttpTrafficStream = trafficAnalysisPreprocessing.preprocessHttpTrafficLogData(httpTrafficStream)
+      val transformationHttpTrafficStream =
+        trafficAnalysisTransformation.addIsTrafficFromBotFlag(preprocessedHttpTrafficStream)
 
     }
   }

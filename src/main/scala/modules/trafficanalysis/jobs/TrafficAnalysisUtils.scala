@@ -9,6 +9,9 @@ import java.util.Properties
 protected[trafficanalysis] object TrafficAnalysisUtils {
   val flinkEnv: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
 
+  val startEscapeChars = Vector('[', '"')
+  val endEscapeChars = Vector(']', '"')
+
   val consumersProperties: Vector[Properties] = MessagingServersConfig.messagingServers.map { server =>
     val properties = generateProperties
     properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, server)
