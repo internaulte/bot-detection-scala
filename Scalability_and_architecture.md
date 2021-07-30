@@ -24,7 +24,7 @@ To check system health, memory usage variations and CPU charge must be monitor. 
 
 ## How to store results ?
 
-Analysis treatments results could be send to a distributed database. A Time Series Database could be used (example: Druid) as timestamped logged data fit well to that logic. It would allow high performance for time-based windowing aggregations and filtering.
+Analysis treatments results could be send to a distributed database. A Time Series Database could be used (example: Druid) as timestamped logged data fit well to that logic. It would allow high performance for time-based windowing aggregations and filtering, for monitoring (number of rejected requests in the last minutes for instance) or post analysis.
 Data deletion could be done periodically through time segment dropping of each segment with end time superior to a given value (10 days here).
 Another solution could be a database with faceting possibilities, like ElasticSearch. It would allow fast query on any prepared facet.
 
@@ -33,3 +33,7 @@ Another solution could be a database with faceting possibilities, like ElasticSe
 To ensure system is doing what is expected, it should be useful to use real bots to request a protected site. If the bot cannot access to the site, test is successful.
 In parallel, do not forget to try to connect as real human to the same protected site, with various browsers and systems and check if normal user can access.
 
+## Monitoring
+
+System resources usages can be monitor using probes on CPU and memory usages for instances, without slowing down the system.
+Grafana could be used to monitor easily resource usages. It could also request the stored results to monitor number of requests accepted an rejected in the last defined period. Requesting on the distributed data storage as exposed in part _How to store results ?_ would have no impact on system performance.
