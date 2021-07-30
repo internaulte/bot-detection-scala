@@ -1,0 +1,35 @@
+# Scalability and architecture
+
+## Increase http requests support to 20000 per second in six months. Possible ?
+
+Once flink treatments would be separated from data generation in bootstrap (separated projects, see _README.md_, part **TODO remaining and improvements**), increasing http requests support could require to increase number of kafka brokers and flink nodes (more tasks nodes, maybe more manager nodes if necessary) if memory or CPUs are overcharged.
+
+## How to architecture high requests number support ?
+
+Data should be send to a distributed kafka topic(s). Then distributed flink can stream data as group consumers (as group consumers of a topic, kafka guaranty that each message is only read once).
+Then flink job can handle the data and detect if request is acceptable or not (first analysis).
+A second treatment could be done after that detection (not done in present code here), through another flink server that would perform analysis of first treatment results to detect abnormal client IP traffic behavior and constantly create a blacklist of clientIP.
+That client IP blacklist would be shared to flink first analysis jobs through a distributed cache (ignite for instance).
+That allows to perform bulk analysis without slowing down traffic treatments as that post analysis phase is asynchronous and blacklist freshness is not a problem for traffic first analysis.
+
+## What needed to push to production environment ?
+
+Code must be obfuscated before to push to production to avoid code leak, as it could ease bot development to pass the analysis.
+To be sure that the system will not block the client web server, an adapted max usable resource configuration for the system must be prepared. Or the system could be installed on a different machine than the client web server, if the additional network latency is acceptable.
+Indeed, the system can have high resource usage which could slow down web server responses.
+
+## Attest system health in production
+
+To check system health, memory usage variations and CPU charge must be monitor. If needed, a new instance of the system could be created to balance the charge.
+
+## How to store results ?
+
+Analysis treatments results could be send to a distributed database. A Time Series Database could be used (example: Druid) as timestamped logged data fit well to that logic. It would allow high performance for time-based windowing aggregations and filtering.
+Data deletion could be done periodically through time segment dropping of each segment with end time superior to a given value (10 days here).
+Another solution could be a database with faceting possibilities, like ElasticSearch. It would allow fast query on any prepared facet.
+
+## How to be sure system is really doing its job ?
+
+To ensure system is doing what is expected, it should be useful to use real bots to request a protected site. If the bot cannot access to the site, test is successful.
+In parallel, do not forget to try to connect as real human to the same protected site, with various browsers and systems and check if normal user can access.
+
