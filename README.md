@@ -44,6 +44,9 @@ in folder containing the docker-compose.yml file, in a terminal:
 
 document system environment variables used, their default values, and what is their impact.
 
+test:
+- missing integration tests in flink job (overall treatment, getting data from kafka)
+
 installation:
 - create separate projects for traffic generation and traffic analysis to be able to install specialized code on separated servers as micro services.
 - write correct docker-compose.yml to have correct kafka and flink servers
