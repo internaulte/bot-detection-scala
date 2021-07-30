@@ -16,7 +16,9 @@ That allows to perform bulk analysis without slowing down traffic treatments as 
 
 Code must be obfuscated before to push to production to avoid code leak, as it could ease bot development to pass the analysis.
 To be sure that the system will not block the client web server, an adapted max usable resource configuration for the system must be prepared. Or the system could be installed on a different machine than the client web server, if the additional network latency is acceptable.
-Indeed, the system can have high resource usage which could slow down web server responses.
+
+Production environment should also be prepared by adding appropriate environment variables values, and appropriate connection of http request entry flow to the kafka brokers on the one hand, appropriate connection to the receiving client web server after http request analysis.
+Be sure that no firewall or other security would reject data stream entry in kafka or requests arriving to web server after request acceptance.
 
 ## Attest system health in production
 
