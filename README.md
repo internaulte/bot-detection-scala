@@ -42,6 +42,8 @@ in folder containing the docker-compose.yml file, in a terminal:
 
 ## TODO remaining and improvements
 
+document system environment variables used, their default values, and what is their impact.
+
 installation:
 - create separate projects for traffic generation and traffic analysis to be able to install specialized code on separated servers as micro services.
 - write correct docker-compose.yml to have correct kafka and flink servers
