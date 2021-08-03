@@ -1,2 +1,9 @@
 *.class
 *.log
+/project/target/
+/.bsp/
+/.idea/
+/mainRunner/target/
+/out/
+/project/project/target/
+/target/
