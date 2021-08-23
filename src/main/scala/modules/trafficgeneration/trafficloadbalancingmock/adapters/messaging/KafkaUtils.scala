@@ -1,4 +1,4 @@
-package modules.trafficgeneration.trafficloadbalancingmock.adapters.kafka
+package modules.trafficgeneration.trafficloadbalancingmock.adapters.messaging
 
 import modules.common.config.MessagingServersConfig
 import org.apache.kafka.clients.CommonClientConfigs

@@ -2,6 +2,6 @@ package modules.trafficgeneration.webserversmock.adapters.repositories.interface
 
 import scala.concurrent.Future
 
-trait WebServerMockRepository {
+protected[webserversmock] trait WebServerMockRepository {
   def sendLogToBotDetection(log: String): Future[Unit]
 }

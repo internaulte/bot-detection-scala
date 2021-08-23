@@ -2,12 +2,12 @@ package modules.bootstrap
 
 import modules.common.config.MessagingServersConfig
 import modules.trafficanalysis.jobs.TrafficAnalysisJobsImpl
-import modules.trafficgeneration.trafficloadbalancingmock.adapters.kafka.{KafkaClientImpl, KafkaUtils}
-import modules.trafficgeneration.trafficloadbalancingmock.adapters.kafka.config.KafkaConfig
-import modules.trafficgeneration.trafficloadbalancingmock.adapters.kafka.interfaces.KafkaClient
+import modules.trafficgeneration.trafficloadbalancingmock.adapters.messaging.{KafkaClientImpl, KafkaUtils}
+import modules.trafficgeneration.trafficloadbalancingmock.adapters.messaging.config.KafkaConfig
+import modules.trafficgeneration.trafficloadbalancingmock.adapters.messaging.interfaces.MessagingClient
 import modules.trafficgeneration.trafficloadbalancingmock.adapters.repositories.HttpTrafficSendRepositoryImpl
 import modules.trafficgeneration.trafficloadbalancingmock.adapters.services.TrafficLoadBalancingServiceImpl
-import modules.trafficgeneration.trafficloadbalancingmock.domain.usecases.HttpTrafficGenerationUseCases
+import modules.trafficgeneration.trafficloadbalancingmock.domain.usecases.HttpTrafficGenerationUseCasesImpl
 import modules.trafficgeneration.webserversmock.adapters.repositories.WebServerMockRepositoryImpl
 import modules.trafficgeneration.webserversmock.config.WebServersDataConfig
 import modules.trafficgeneration.webserversmock.domain.usecases.WebServerMockUseCases
@@ -19,9 +19,9 @@ object Bootstrap {
   def main(args: Array[String]): Unit = {
 
     // Instances initialization
-    lazy val kafkaClient: KafkaClient = new KafkaClientImpl
+    lazy val kafkaClient: MessagingClient = new KafkaClientImpl
     lazy val httpTrafficSendRepository = new HttpTrafficSendRepositoryImpl(kafkaClient)
-    lazy val httpTrafficGenerationUseCases = new HttpTrafficGenerationUseCases(httpTrafficSendRepository)
+    lazy val httpTrafficGenerationUseCases = new HttpTrafficGenerationUseCasesImpl(httpTrafficSendRepository)
     lazy val trafficLoadBalancingService = new TrafficLoadBalancingServiceImpl(httpTrafficGenerationUseCases)
     lazy val webServerMockRepository = new WebServerMockRepositoryImpl(trafficLoadBalancingService)
     lazy val webServerMockUseCases = new WebServerMockUseCases(webServerMockRepository)

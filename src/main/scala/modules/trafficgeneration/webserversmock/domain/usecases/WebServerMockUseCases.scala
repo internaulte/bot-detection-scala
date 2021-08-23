@@ -7,7 +7,7 @@ import modules.trafficgeneration.webserversmock.domain.entities.WebServerLogs
 import scala.annotation.tailrec
 import scala.concurrent.Future
 
-class WebServerMockUseCases(private val webServerMockRepository: WebServerMockRepository) {
+protected[webserversmock] class WebServerMockUseCases(private val webServerMockRepository: WebServerMockRepository) {
   def sendAllWebServerLogsToBotDetection(webServerLogs: WebServerLogs): Future[Unit] = {
     sendWebServerLogsToBotDetection(allLogs = webServerLogs.logs, nonSendLogs = webServerLogs.logs, iteration = 0)
   }

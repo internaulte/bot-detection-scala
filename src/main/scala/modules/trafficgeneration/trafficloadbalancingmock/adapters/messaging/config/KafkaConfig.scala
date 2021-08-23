@@ -1,4 +1,4 @@
-package modules.trafficgeneration.trafficloadbalancingmock.adapters.kafka.config
+package modules.trafficgeneration.trafficloadbalancingmock.adapters.messaging.config
 
 object KafkaConfig {
   val topicNumberOfPartitions: Int = sys.env.getOrElse("KAFKA_TOPICS_NUMBER_PARTITIONS", "1").toInt

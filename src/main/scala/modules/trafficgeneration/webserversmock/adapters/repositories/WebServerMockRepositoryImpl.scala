@@ -6,8 +6,9 @@ import modules.trafficgeneration.webserversmock.adapters.repositories.interfaces
 
 import scala.concurrent.Future
 
-class WebServerMockRepositoryImpl(private val trafficLoadBalancingService: TrafficLoadBalancingService)
-    extends WebServerMockRepository {
+protected[webserversmock] class WebServerMockRepositoryImpl(
+    private val trafficLoadBalancingService: TrafficLoadBalancingService
+) extends WebServerMockRepository {
   override def sendLogToBotDetection(log: String): Future[Unit] = {
     trafficLoadBalancingService.sendWebServerLog(
       log = log,

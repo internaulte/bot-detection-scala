@@ -1,0 +1,5 @@
+package modules.trafficgeneration.trafficloadbalancingmock.domain.usecases
+
+import core.MockitoUnitTestSpec
+
+final class HttpTrafficGenerationUseCasesImplTest extends MockitoUnitTestSpec {}
